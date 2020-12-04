@@ -55,11 +55,11 @@ L.geoJson(statesData, {style: style}).addTo(map);
 function ChangeData() {
     var new_statesData=statesData
     var newData=GenerateFake();
-    console.log(newData)
+    // console.log(newData)
     for (var i=0; i<statesData.features.length; i++) {
         var name=statesData.features[i].properties.name
         var state=newData.filter(d=>d.state_name===name)[0]
-        console.log(state)
+        // console.log(state)
         var newvalue=state.contamination
         new_statesData.features[i].properties.density=newvalue
     }
