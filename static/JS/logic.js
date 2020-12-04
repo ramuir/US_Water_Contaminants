@@ -10,6 +10,4 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     accessToken: mapboxAccessToken
 }).addTo(map);
 
-var geoData= "static/data/states.geojson";
-
-// L.geoJson(geoData).addTo(map);
+L.geoJson(statesData).addTo(map);
