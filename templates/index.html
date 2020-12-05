@@ -10,7 +10,7 @@
     crossorigin=""/>
 
     <!-- Our CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   </head>
   <body>
@@ -27,15 +27,14 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
 
     <!-- Leaflet-Choropleth JavaScript -->
-    <script type="text/javascript" src="{{ url_for 'static/JS', filename= 'choropleth.js' }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename= 'JS/choropleth.js') }}"></script>
 
     <!-- Our JS -->
-    <script type="text/javascript" src="{{ url_for 'static/JS', filename= 'config_new.js' }}"></script>
-    <script type="text/javascript" src="{{ url_for 'static/data', filename= 'states.js' }}"></script>
-    <script type="text/javascript" src="{{ url_for 'static/JS', filename= 'logic.js' }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename= 'JS/config_new.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename= 'data/states.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename= 'JS/logic.js') }}"></script>
 
   </body>
 </html>
 
 
-{% for d in data %}
