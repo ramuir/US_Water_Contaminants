@@ -1,19 +1,4 @@
-var mapboxAccessToken = API_KEY
-var map = L.map('map').setView([37.8, -96], 5);
-
-
-
-L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapboxAccessToken, {
-    id: 'mapbox/light-v9',
-    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
-    tileSize: 512,
-    maxZoom: 18,
-    zoomOffset: -1,
-    accessToken: mapboxAccessToken
-}).addTo(map);
-
-// enter values of specific conamination
-
+//Initializes user input choices for analytes
 function initalizeChoices() {
     d3.json("/api/contaminates_list", function(c_list) {
 
@@ -27,6 +12,7 @@ function initalizeChoices() {
     })
 }
 
+//Initializes user choices for state
 function initializeStates(){
     d3.json("/api/states", function(states) {
         l=Object.keys(states.City).length
@@ -38,7 +24,7 @@ function initializeStates(){
     })
 }
 
-// generating fake data
+// generating fake data DELETE THIS LATER
 function GenerateFake() {
     var fakeData=[];
     for (var i=0; i<statesData.features.length; i++) {
@@ -52,6 +38,7 @@ function GenerateFake() {
     return fakeData
 }
 
+//Pick colors for choropleth
 function getColor(d) {
     return d > 70 ? '#800026' :
            d > 60  ? '#BD0026' :
@@ -63,6 +50,7 @@ function getColor(d) {
                       '#FFEDA0';
 }
 
+//Apply colors to choropleth
 function style(feature) {
     return {
         fillColor: getColor(feature.properties.density),
@@ -74,8 +62,8 @@ function style(feature) {
     };
 }
 
-L.geoJson(statesData, {style: style}).addTo(map);
 
+//Updates the data
 function ChangeData() {
     d3.json("/api/contaminates", function(contaminants) { 
         console.log(contaminants);
@@ -95,6 +83,36 @@ function ChangeData() {
         return new_statesData
     })
 }
+
+
+
+
+
+
+
+
+
+
+//Script to Run
+
+//map info
+var mapboxAccessToken = API_KEY
+var map = L.map('map').setView([37.8, -96], 5);
+
+
+//Generate map
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapboxAccessToken, {
+    id: 'mapbox/light-v9',
+    attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
+    tileSize: 512,
+    maxZoom: 18,
+    zoomOffset: -1,
+    accessToken: mapboxAccessToken
+}).addTo(map);
+
+//Add choropleth to the map
+L.geoJson(statesData, {style: style}).addTo(map);
+
 
 initalizeChoices()
 initializeStates()
