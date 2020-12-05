@@ -1,8 +1,7 @@
 var mapboxAccessToken = API_KEY
 var map = L.map('map').setView([37.8, -96], 5);
 
-d3.json("/api/contaminants", function(contaminants) { 
-    console.log(contaminants);
+
 
 L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=' + mapboxAccessToken, {
     id: 'mapbox/light-v9',
@@ -56,22 +55,24 @@ function style(feature) {
 L.geoJson(statesData, {style: style}).addTo(map);
 
 function ChangeData() {
-    var new_statesData=statesData
-    var newData=GenerateFake();
-    // console.log(newData)
-    for (var i=0; i<statesData.features.length; i++) {
-        var name=statesData.features[i].properties.name
-        var state=newData.filter(d=>d.state_name===name)[0]
-        // console.log(state)
-        var newvalue=state.contamination
-        new_statesData.features[i].properties.density=newvalue
-    }
+    d3.json("/api/contaminants", function(contaminants) { 
+        console.log(contaminants);
 
-    L.geoJson(new_statesData, {style: style}).addTo(map);
-    return new_statesData
+        var new_statesData=statesData
+        var newData=GenerateFake();
+        // console.log(newData)
+        for (var i=0; i<statesData.features.length; i++) {
+            var name=statesData.features[i].properties.name
+            var state=newData.filter(d=>d.state_name===name)[0]
+            // console.log(state)
+            var newvalue=state.contamination
+            new_statesData.features[i].properties.density=newvalue
+        }
 
+        L.geoJson(new_statesData, {style: style}).addTo(map);
+        return new_statesData
+    })
 }
 
 
-L.geoJson(statesData).addTo(map);
-});
+// L.geoJson(statesData).addTo(map);
