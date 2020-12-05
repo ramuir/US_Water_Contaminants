@@ -14,7 +14,29 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 
 // enter values of specific conamination
 
+function initalizeChoices() {
+    d3.json("/api/contaminates_list", function(c_list) {
 
+        l=Object.keys(c_list.Contaminates).length
+        var dropdown = d3.select("#selDataset")
+        for (var j =0; j<l; j++) {
+            // console.log(c_list.Contaminates[j])
+            dropdown.append("option").text(c_list.Contaminates[j]).attr("value", `option${j+1}`)
+        }
+
+    })
+}
+
+function initializeStates(){
+    d3.json("/api/states", function(states) {
+        l=Object.keys(states.City).length
+        console.log(l)
+        var dropdown = d3.select('#selState')
+        for (var j=0; j<l; j++) {
+            dropdown.append("option").text(states.City[j]).attr("value", `option${j+1}`)
+        }
+    })
+}
 
 // generating fake data
 function GenerateFake() {
@@ -55,7 +77,7 @@ function style(feature) {
 L.geoJson(statesData, {style: style}).addTo(map);
 
 function ChangeData() {
-    d3.json("/api/contaminants", function(contaminants) { 
+    d3.json("/api/contaminates", function(contaminants) { 
         console.log(contaminants);
 
         var new_statesData=statesData
@@ -74,5 +96,5 @@ function ChangeData() {
     })
 }
 
-
-// L.geoJson(statesData).addTo(map);
+initalizeChoices()
+initializeStates()
