@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, url_for
 import pandas as pd
 from sqlalchemy import create_engine
+import json
 import L_funct
 
 app = Flask(__name__)
@@ -13,17 +14,29 @@ def index():
 
 
 @app.route("/api/contaminants")
-def cities():
+def total():
     return pd.read_sql_table("water_contamination", engine).to_json(orient="records")
 
+
+
+@app.route("/api/<analyte>/<state>")
+def fa(analyte, state):
+    print(analyte)
+    print(state)
+    data_1, data_2 = L_funct.find_analyte(analyte, state)
+    d1_json = data_1.to_json()
+    d2_json = data_2.to_json(orient='records')
+
+    return jsonify(d1 = json.loads(d1_json), d2 = json.loads(d2_json))
+
 @app.route("/api/contaminates_list")
-def cities2():
+def conList():
     contam_list=L_funct.find_contaminates()
     df_contam = pd.DataFrame({"Contaminates":contam_list})
     return df_contam.to_json()
 
 @app.route("/api/states")
-def cities3():
+def stList():
     states_list = L_funct.find_states()
     return states_list.to_json()
 

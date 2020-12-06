@@ -6,7 +6,7 @@ function initalizeChoices() {
         var dropdown = d3.select("#selDataset")
         for (var j =0; j<l; j++) {
             // console.log(c_list.Contaminates[j])
-            dropdown.append("option").text(c_list.Contaminates[j]).attr("value", `option${j+1}`)
+            dropdown.append("option").text(c_list.Contaminates[j]).attr("value", c_list.Contaminates[j])
         }
 
     })
@@ -16,10 +16,10 @@ function initalizeChoices() {
 function initializeStates(){
     d3.json("/api/states", function(states) {
         l=Object.keys(states.City).length
-        console.log(l)
+        // console.log(l)
         var dropdown = d3.select('#selState')
         for (var j=0; j<l; j++) {
-            dropdown.append("option").text(states.City[j]).attr("value", `option${j+1}`)
+            dropdown.append("option").text(states.City[j]).attr("value", states.City[j])
         }
     })
 }
@@ -28,7 +28,7 @@ function initializeStates(){
 function GenerateFake() {
     var fakeData=[];
     for (var i=0; i<statesData.features.length; i++) {
-        var max = 80
+        var max = 100
         var min = 0
         var value = Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -40,14 +40,16 @@ function GenerateFake() {
 
 //Pick colors for choropleth
 function getColor(d) {
-    return d > 70 ? '#800026' :
-           d > 60  ? '#BD0026' :
-           d > 50  ? '#E31A1C' :
-           d > 40  ? '#FC4E2A' :
-           d > 30   ? '#FD8D3C' :
-           d > 20   ? '#FEB24C' :
-           d > 10   ? '#FED976' :
-                      '#FFEDA0';
+    return d > 90 ? '#a50026' :
+           d > 80  ? '#d73027' :
+           d > 70  ? '#f46d43' :
+           d > 60  ? '#fdae61' :
+           d > 50  ? '#fee08b' :
+           d > 40  ? '#d9ef8b' :
+           d > 30  ? '#a6d96a' :
+           d > 20  ? '#66bd63' :
+           d > 10  ? '#1a9850' :
+                     '#006837' ;
 }
 
 //Apply colors to choropleth
@@ -64,8 +66,8 @@ function style(feature) {
 
 
 //Updates the data
-function ChangeData() {
-    d3.json("/api/contaminates", function(contaminants) { 
+function ChangeData(call) {
+    d3.json(call, function(contaminants) { 
         console.log(contaminants);
 
         var new_statesData=statesData
@@ -85,7 +87,20 @@ function ChangeData() {
 }
 
 
+function UpdateData() {
+    var dropdown1 = d3.select("#selDataset")
+    var dropdown2 = d3.select("#selState")
+    var dataset1 = dropdown1.property("value")
+    var dataset2 = dropdown2.property("value")
 
+    call2=`/api/${dataset1}/${dataset2}`
+    console.log(call2)
+
+    ChangeData(call2)
+    // d3.json(call2, function(data) {
+    //     console.log(data)
+    // })
+}
 
 
 
@@ -116,3 +131,6 @@ L.geoJson(statesData, {style: style}).addTo(map);
 
 initalizeChoices()
 initializeStates()
+
+d3.selectAll('#selDataset').on("change",UpdateData)
+d3.selectAll('#selState').on("change",UpdateData)
