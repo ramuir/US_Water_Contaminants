@@ -3,14 +3,13 @@ from sqlalchemy import create_engine
 
 
 def find_contaminates():
-    engine = create_engine("sqlite:///generate_sql/water_contamination_sql.sqlite")
-    data = pd.read_sql_table("water_contamination", engine)
-    list_names=data['Analyte Name'].value_counts().index.tolist()
+    data=pd.read_csv("static/data/Contaminants.csv")
+    list_names=data['Analyte'].tolist()
     
     return list_names
 
 def find_states():
-    data = pd.read_csv("statelatlong.csv")
+    data = pd.read_csv("static/data/statelatlong.csv")
 
     return data
 
@@ -24,3 +23,9 @@ def find_analyte(analyte, state):
     data_a=q.groupby(['State']).mean()
     data_a=data_a.fillna(0)
     return data_a, data_s
+
+def find_info(analyte):
+    data=pd.read_csv("static/data/Contaminants.csv")
+    d=data.loc[data['Analyte']==analyte]
+
+    return d

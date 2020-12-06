@@ -26,8 +26,10 @@ def fa(analyte, state):
     data_1, data_2 = L_funct.find_analyte(analyte, state)
     d1_json = data_1.to_json()
     d2_json = data_2.to_json(orient='records')
+    data_3 = L_funct.find_info(analyte)
+    d3_json = data_3.to_json(orient='records')
 
-    return jsonify(d1 = json.loads(d1_json), d2 = json.loads(d2_json))
+    return jsonify(choropleth = json.loads(d1_json), table = json.loads(d2_json), info = json.loads(d3_json))
 
 @app.route("/api/contaminates_list")
 def conList():
