@@ -23,32 +23,55 @@
     <div id="header">
       <h1>Water Contaminates in the USA</h1>
     </div>
-    <div id="map"></div>
-    <div id="user_input" class=container>
+    <div id="map"></div><br>
+    <div id="user_input" class="container">
       <div class='row'>
-        <div class="col-md-6">
+        <div class="col-md-6" style="text-align: center">
           <strong>Select Analyte</strong>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6" style="text-align: center">
           <strong>Select State</strong>
         </div>
       </div>
       <div class='row'>
-        <div class="col-md-6">
-          <select id=selDataset>
-
-          </select>
+        <div class="col-md-6" style="text-align: center">
+          <select id=selDataset></select>
         </div>
-        <div class="col-md-6">
-          <select id=selState>
-
-          </select>
+        <div class="col-md-6" style="text-align: center">
+          <select id=selState></select>
         </div>
       </div>
     </div>
+    <br><br>
+    <div id="analyte_info" class="container">
+      <div class="row" id="analyte_head" style="vertical-align: center">
+        <h2 id="analyte_name">Analyte</h2>
+      </div>
+      <div class="row" id="analyte_additional"></div><br>
+      <div class="row" id="analyte_labels">
+        <div class="col-md-4" style="text-align: center"><strong>Caution Value</strong></div>
+        <div class="col-md-4" style="text-align: center"><strong>Extreme Caution Value</strong></div>
+        <div class="col-md-4" style="text-align: center"><strong>Danger Value</strong></div>
+      </div>
+      <div class="row" id="analyte_caution">
+        <div class="col-md-4" id="caution" style="text-align: center"></div>
+        <div class="col-md-4" id="extreme_caution" style="text-align: center"></div>
+        <div class="col-md-4" id="danger" style="text-align: center"></div>
+      </div>
+      <br>
+      <div class="row" id="url">
+        <a id="url_text" href="" target="_blank">For more information, click here to find out more information about the chosen contaminate!</a>
+      </div>
+    </div>
+    <br><br>
     <div id="graph"></div>
-    <div id="data_table"></div>
-
+    <div id="table">
+      <table id="data_table" class="table table-striped">
+        <thead id="table_head"></thead>
+        <tbody id="table_body"></tbody>
+      </table>
+    </div>
+    <br><br><br><br><br><br><br><br><br>
 
     <!-- Leaflet JS-->
     <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"

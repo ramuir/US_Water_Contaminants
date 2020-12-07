@@ -70,6 +70,12 @@ function ChangeData(call) {
     d3.json(call, function(contaminants) { 
         console.log(contaminants);
 
+        var addInfo=contaminants.info[0]
+        UpdateAdditional(addInfo)
+
+        var tabledata=contaminants.table
+        UpdateTable(tabledata)
+
         var new_statesData=statesData
         var newData=GenerateFake();
         // console.log(newData)
@@ -86,12 +92,71 @@ function ChangeData(call) {
     })
 }
 
+// Update Additional data
+function UpdateAdditional(analyte) {
+    // console.log(analyte)
+    var A_name=d3.select("#analyte_name")
+    A_name.text(analyte.Analyte)
+    var val1=d3.select("#caution")
+    var val2=d3.select("#extreme_caution")
+    var val3=d3.select("#danger")
+    val1.text(analyte.Caution + " "+ analyte.Units)
+    val2.text(analyte['Extreme Caution'] + " "+ analyte.Units)
+    val3.text(analyte.Danger + " "+ analyte.Units)
+    var link=d3.select('#url_text')
+    var t= "https://" + analyte.Link
+    link.attr("href", analyte.Link)
+    var info=d3.select('#analyte_additional')
+    info.text(analyte["Additional Info"])
+}
+
+function UpdateTable(data) {
+    console.log(data)
+    var titles=d3.select("#table_head")
+    titles.html("")
+    titles.append('tr').attr('id', 'data-header')
+    var rowheader=d3.select("#data-header")
+    rowheader.append('th').text("Analyte Name").attr('class','table-head')
+    rowheader.append('th').text("State").attr('class','table-head')
+    // rowheader.append('th').text("Station Served").attr('class','table-head')
+    rowheader.append('th').text("Population Served").attr('class','table-head')
+    rowheader.append('th').text("Source Water Type").attr('class','table-head')
+    rowheader.append('th').text("Analyte Detected?").attr('class','table-head')
+    rowheader.append('th').text("Value Detected").attr('class','table-head')
+    rowheader.append('th').text("Value Units").attr('class','table-head')
+    console.log(data.length)
+
+    var Tdata=d3.select("#table_body")
+    Tdata.html("")
+    for (var i=0; i<data.length; i++) {
+        var listName="Item_"+i
+        var detect=""
+        if(data[i].Detect===0) {
+            detect="No"
+        } else {
+            detect="Yes"
+        }
+
+        Tdata.append('tr').attr("id", listName)
+        var row= d3.select('#'+listName)
+        row.append('th').text(data[i]["Analyte Name"])
+        row.append('th').text(data[i].State)
+        // row.append('th').text()
+        row.append('th').text(data[i]["Retail Population Served"])
+        row.append('th').text(data[i]["Source Water Type"])
+        row.append('th').text(detect)
+        row.append('th').text(data[i].Value)
+        row.append('th').text(data[i].Unit)
+    }
+}
+
 
 function UpdateData() {
     var dropdown1 = d3.select("#selDataset")
     var dropdown2 = d3.select("#selState")
     var dataset1 = dropdown1.property("value")
     var dataset2 = dropdown2.property("value")
+    console.log(dataset1)
 
     call2=`/api/${dataset1}/${dataset2}`
     console.log(call2)
@@ -131,6 +196,8 @@ L.geoJson(statesData, {style: style}).addTo(map);
 
 initalizeChoices()
 initializeStates()
+call_init="/api/ARSENIC/Alabama"
+ChangeData(call_init)
 
 d3.selectAll('#selDataset').on("change",UpdateData)
 d3.selectAll('#selState').on("change",UpdateData)
