@@ -40,16 +40,21 @@ function GenerateFake() {
 
 //Pick colors for choropleth
 function getColor(d) {
-    return d > 90 ? '#a50026' :
-           d > 80  ? '#d73027' :
-           d > 70  ? '#f46d43' :
-           d > 60  ? '#fdae61' :
-           d > 50  ? '#fee08b' :
-           d > 40  ? '#d9ef8b' :
-           d > 30  ? '#a6d96a' :
-           d > 20  ? '#66bd63' :
-           d > 10  ? '#1a9850' :
-                     '#006837' ;
+    if (d>5) {
+        return  d > 90  ? '#a50026' :
+                d > 80  ? '#d73027' :
+                d > 70  ? '#f46d43' :
+                d > 60  ? '#fdae61' :
+                d > 50  ? '#fee08b' :
+                d > 40  ? '#d9ef8b' :
+                d > 30  ? '#a6d96a' :
+                d > 20  ? '#66bd63' :
+                d > 10  ? '#1a9850' :
+                          '#006837' ;
+    } else {
+        return '#d3d3d3';
+    }
+    
 }
 
 //Apply colors to choropleth
@@ -60,7 +65,7 @@ function style(feature) {
         opacity: 1,
         color: 'white',
         dashArray: '3',
-        fillOpacity: 0.7
+        fillOpacity: 1
     };
 }
 
