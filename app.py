@@ -24,7 +24,7 @@ def fa(analyte, state):
     print(analyte)
     print(state)
     data_1, data_2 = L_funct.find_analyte(analyte, state)
-    d1_json = json.dumps(data_1)
+    d1_json = data_1.to_json(orient='records')
     d2_json = data_2.to_json(orient='records')
     data_3 = L_funct.find_info(analyte)
     d3_json = data_3.to_json(orient='records')

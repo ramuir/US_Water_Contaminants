@@ -16,7 +16,6 @@ function initalizeChoices() {
 function initializeStates(){
     d3.json("/api/states", function(states) {
         l=Object.keys(states.City).length
-        // console.log(l)
         var dropdown = d3.select('#selState')
         for (var j=0; j<l; j++) {
             dropdown.append("option").text(states.City[j]).attr("value", states.City[j])
@@ -40,17 +39,20 @@ function GenerateFake() {
 
 //Pick colors for choropleth
 function getColor(d) {
-    if (d>5) {
-        return  d > 90  ? '#a50026' :
-                d > 80  ? '#d73027' :
-                d > 70  ? '#f46d43' :
-                d > 60  ? '#fdae61' :
-                d > 50  ? '#fee08b' :
-                d > 40  ? '#d9ef8b' :
-                d > 30  ? '#a6d96a' :
-                d > 20  ? '#66bd63' :
-                d > 10  ? '#1a9850' :
-                          '#006837' ;
+    if (d>=0) {
+        return  d > 70  ? '#a50026' :
+                d > 60  ? '#d73027' :
+                d > 50  ? '#f46d43' :
+                d > 40  ? '#fdae61' :
+                d > 30  ? '#fee08b' :
+                d > 20  ? '#d9ef8b' :
+                d > 10  ? '#a6d96a' :
+                          '#66bd63' ;
+
+    } else if (d==0) {
+        return '#1a9850' ;
+    } else if (d==-1) {
+        return '#006837';
     } else {
         return '#d3d3d3';
     }
@@ -82,14 +84,29 @@ function ChangeData(call) {
         UpdateTable(tabledata)
 
         var new_statesData=statesData
-        var newData=GenerateFake();
-        // console.log(newData)
+        var newData2=GenerateFake();
+        var newData=contaminants.choropleth
         for (var i=0; i<statesData.features.length; i++) {
             var name=statesData.features[i].properties.name
-            var state=newData.filter(d=>d.state_name===name)[0]
-            // console.log(state)
-            var newvalue=state.contamination
+            var state=newData.filter(d=>d.State===name)[0]
+            // console.log(state2)
+            var newvalue=0
+            if (typeof state == "undefined") {
+                // console.log(name);
+                newvalue=-2
+            } else {
+                if (state.Measured_Number === 0) {
+                    newvalue=-1
+                } else {
+                    newvalue=state.Caution_Number+state.Extreme_C_Number+state.Danger_Number
+                }
+            }
             new_statesData.features[i].properties.density=newvalue
+
+            var state2=newData2.filter(d=>d.state_name===name)[0]
+            var newvalue2=state2.contamination
+            // console.log(newvalue, name)
+
         }
 
         L.geoJson(new_statesData, {style: style}).addTo(map);
@@ -116,20 +133,19 @@ function UpdateAdditional(analyte) {
 }
 
 function UpdateTable(data) {
-    console.log(data)
+    // console.log(data)
     var titles=d3.select("#table_head")
     titles.html("")
     titles.append('tr').attr('id', 'data-header')
     var rowheader=d3.select("#data-header")
     rowheader.append('th').text("Analyte Name").attr('class','table-head')
     rowheader.append('th').text("State").attr('class','table-head')
-    // rowheader.append('th').text("Station Served").attr('class','table-head')
+    rowheader.append('th').text("Station Served").attr('class','table-head')
     rowheader.append('th').text("Population Served").attr('class','table-head')
     rowheader.append('th').text("Source Water Type").attr('class','table-head')
     rowheader.append('th').text("Analyte Detected?").attr('class','table-head')
     rowheader.append('th').text("Value Detected").attr('class','table-head')
     rowheader.append('th').text("Value Units").attr('class','table-head')
-    console.log(data.length)
 
     var Tdata=d3.select("#table_body")
     Tdata.html("")
@@ -146,7 +162,7 @@ function UpdateTable(data) {
         var row= d3.select('#'+listName)
         row.append('th').text(data[i]["Analyte Name"])
         row.append('th').text(data[i].State)
-        // row.append('th').text()
+        row.append('th').text(data[i]["System Name"])
         row.append('th').text(data[i]["Retail Population Served"])
         row.append('th').text(data[i]["Source Water Type"])
         row.append('th').text(detect)
@@ -167,9 +183,6 @@ function UpdateData() {
     console.log(call2)
 
     ChangeData(call2)
-    // d3.json(call2, function(data) {
-    //     console.log(data)
-    // })
 }
 
 
@@ -178,11 +191,12 @@ function UpdateData() {
 
 
 
-//Script to Run
+//Script that Runs
 
 //map info
 var mapboxAccessToken = API_KEY
 var map = L.map('map').setView([37.8, -96], 4);
+var legend = L.control({position: 'bottomright'})
 
 
 //Generate map
@@ -199,10 +213,42 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 L.geoJson(statesData, {style: style}).addTo(map);
 
 
+//Run inital scripts to generate data
 initalizeChoices()
 initializeStates()
 call_init="/api/ARSENIC/Alabama"
 ChangeData(call_init)
 
+
+//Add Legend to the map
+legend.onAdd = function(map) {
+    var div = L.DomUtil.create('div', 'info legend'),
+        grades = [-2, -1, 0 ,10 , 20, 30, 40, 50, 60, 70, 80],
+        labels = []
+
+    for (var i=0; i <grades.length; i++) {
+        if (i==0) {
+            div.innerHTML +=
+            '<i style="background:' + getColor(grades[i]) + '"></i> ' + 'No Measurements <br>'
+        } else if (i==1) {
+            div.innerHTML +=
+            '<i style="background:' + getColor(grades[i]) + '"></i> ' + 'No Detected Measure <br>'
+        } else if (i==2) {
+            div.innerHTML +=
+            '<i style="background:' + getColor(grades[i]) + '"></i> ' + 'All Below Threshold <br>'
+        }
+        else {
+            div.innerHTML +=
+            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + ' Above Threshold <br>': '+ Above Threshold') 
+        }
+        console.log(getColor(grades[i] + 1))
+    }
+    return div
+}
+
+legend.addTo(map);
+
+// Update data based on User dropdown select
 d3.selectAll('#selDataset').on("change",UpdateData)
 d3.selectAll('#selState').on("change",UpdateData)

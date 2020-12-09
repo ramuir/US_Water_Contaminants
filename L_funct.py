@@ -25,18 +25,31 @@ def find_analyte(analyte, state):
     caution=ana['Caution'].tolist()[0]
     excaution=ana['Extreme Caution'].tolist()[0]
     danger=ana['Danger'].tolist()[0]
-    num_d=data_s.loc[data_s['Value']>danger].shape[0]
-    num_exc=data_s.loc[data_s['Value']>excaution].shape[0]-num_d
-    num_c=data_s.loc[data_s['Value']>caution].shape[0]-num_exc
-    num_val=data_s.loc[data_s['Detect']==1].shape[0]
-    # num_val=1
 
-    num_dict={"Caution_Number": num_c,
-              "Extreme_C_Number": num_exc,
-              "Danger_Number": num_d,
-              "Measured_Number": num_val}
+    num_df=pd.DataFrame({"State": [],
+                "Caution_Number": [],
+                "Extreme_C_Number": [],
+                "Danger_Number": [],
+                "Measured_Number": [],
+                "Total_Number": []})
 
-    return num_dict, data_s
+    for s in data['State'].unique():
+        d = data.loc[data['State']==s]
+        num_d=d.loc[d['Value']>danger].shape[0]
+        num_exc=d.loc[d['Value']>excaution].shape[0]-num_d
+        num_c=d.loc[d['Value']>caution].shape[0]-num_exc
+        num_val=d.loc[d['Detect']==1].shape[0]
+        num_tot=d.shape[0]
+
+        num_dict=pd.DataFrame({"State": [s],
+                "Caution_Number": [num_c],
+                "Extreme_C_Number": [num_exc],
+                "Danger_Number": [num_d],
+                "Measured_Number": [num_val],
+                "Total_Number": [num_tot]})
+        num_df=num_df.append(num_dict)
+
+    return num_df, data_s
 
 def find_info(analyte):
     data=pd.read_csv("static/data/Contaminants.csv")
