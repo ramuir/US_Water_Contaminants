@@ -10,7 +10,11 @@ html {
 }
 
 #map {
-  height: 700px;
+  height: 600px;
+}
+
+#mapContainer {
+  width: 90%;
 }
 
 .leaflet-popup-content {

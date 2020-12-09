@@ -177,7 +177,7 @@ function UpdateData() {
 
 //map info
 var mapboxAccessToken = API_KEY
-var map = L.map('map').setView([37.8, -96], 5);
+var map = L.map('map').setView([37.8, -96], 4);
 
 
 //Generate map
