@@ -1,3 +1,7 @@
+//Functions List
+
+//Initialized page for user choices
+
 //Initializes user input choices for analytes
 function initalizeChoices() {
     d3.json("/api/contaminates_list", function(c_list) {
@@ -37,6 +41,9 @@ function GenerateFake() {
     return fakeData
 }
 
+
+//Generate colors for choropleth
+
 //Pick colors for choropleth
 function getColor(d) {
     if (d>=0) {
@@ -72,10 +79,27 @@ function style(feature) {
 }
 
 
-//Updates the data
+
+//Functions that run the data dump
+
+//Updates Data based on User Input -- MAIN FUNCTION
+function UpdateData() {
+    var dropdown1 = d3.select("#selDataset")
+    var dropdown2 = d3.select("#selState")
+    var dataset1 = dropdown1.property("value")
+    var dataset2 = dropdown2.property("value")
+    console.log(dataset1)
+
+    call2=`/api/${dataset1}/${dataset2}`
+    console.log(call2)
+
+    ChangeData(call2)
+}
+
+//Updates the data - Called by Update Data
 function ChangeData(call) {
     d3.json(call, function(contaminants) { 
-        console.log(contaminants);
+        // console.log(contaminants);
 
         var addInfo=contaminants.info[0]
         UpdateAdditional(addInfo)
@@ -86,6 +110,7 @@ function ChangeData(call) {
         var new_statesData=statesData
         var newData2=GenerateFake();
         var newData=contaminants.choropleth
+        UpdateInvTable(newData)
         for (var i=0; i<statesData.features.length; i++) {
             var name=statesData.features[i].properties.name
             var state=newData.filter(d=>d.State===name)[0]
@@ -171,19 +196,37 @@ function UpdateTable(data) {
     }
 }
 
+// Make invisible table for choropleth
+function UpdateInvTable(data) {
+    console.log(data)
+    var titles=d3.select("#table_head_inv")
+    titles.html("")
+    titles.append('tr').attr('id', 'data-header_inv')
+    var rowheader=d3.select("#data-header_inv")
+    rowheader.append('th').text("Caution_Number").attr('class','table-head')
+    rowheader.append('th').text("Danger_Number").attr('class','table-head')
+    rowheader.append('th').text("Extreme_C_Number").attr('class','table-head')
+    rowheader.append('th').text("Measured_Number").attr('class','table-head')
+    rowheader.append('th').text("State").attr('class','table-head')
+    rowheader.append('th').text("Total_Number").attr('class','table-head')
 
-function UpdateData() {
-    var dropdown1 = d3.select("#selDataset")
-    var dropdown2 = d3.select("#selState")
-    var dataset1 = dropdown1.property("value")
-    var dataset2 = dropdown2.property("value")
-    console.log(dataset1)
+    var Tdata=d3.select("#table_body_inv")
+    Tdata.html("")
+    for (var i=0; i<data.length; i++) {
+        var listName=data[i].State+'_counts'
+        listName=listName.replace(" ", "_").replace(" ", "_")
+        Tdata.append('tr').attr("id", listName)
+        var row= d3.select('#'+listName)
 
-    call2=`/api/${dataset1}/${dataset2}`
-    console.log(call2)
-
-    ChangeData(call2)
+        row.append('th').text(data[i]["Caution_Number"])
+        row.append('th').text(data[i]["Danger_Number"])
+        row.append('th').text(data[i]["Extreme_C_Number"])
+        row.append('th').text(data[i]["Measured_Number"])
+        row.append('th').text(data[i]["State"])
+        row.append('th').text(data[i]["Total_Number"])
+    }
 }
+
 
 
 

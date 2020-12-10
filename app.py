@@ -21,8 +21,6 @@ def total():
 
 @app.route("/api/<analyte>/<state>")
 def fa(analyte, state):
-    print(analyte)
-    print(state)
     data_1, data_2 = L_funct.find_analyte(analyte, state)
     d1_json = data_1.to_json(orient='records')
     d2_json = data_2.to_json(orient='records')
