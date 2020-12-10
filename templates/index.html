@@ -18,14 +18,13 @@
 
   </head>
   <body>
+    <div  class="background">
 
     <!-- The div where we will inject our map -->
     <div id="header">
       <h1>Water Contaminants in the USA</h1>
     </div>
-    <div class="container" id="mapContainer">
-      <div id="map"></div>
-    </div><br>
+
     <div id="user_input" class="container">
       <div class='row'>
         <div class="col-md-6" style="text-align: center">
@@ -45,6 +44,32 @@
       </div>
     </div>
     <br><br>
+
+    <div class="container" id="mapContainer">
+      <div id="map"></div>
+    </div><br>
+
+    <!-- Moved drop downs to top -->
+
+    <!-- <div id="user_input" class="container">
+      <div class='row'>
+        <div class="col-md-6" style="text-align: center">
+          <strong>Select Analyte</strong>
+        </div>
+        <div class="col-md-6" style="text-align: center">
+          <strong>Select State</strong>
+        </div>
+      </div>
+      <div class='row'>
+        <div class="col-md-6" style="text-align: center">
+          <select id=selDataset></select>
+        </div>
+        <div class="col-md-6" style="text-align: center">
+          <select id=selState></select>
+        </div>
+      </div>
+    </div>
+    <br><br> -->
     <div id="analyte_info" class="container">
       <div class="row" id="analyte_head" style="vertical-align: center">
         <h2 id="analyte_name">Analyte</h2>
@@ -74,7 +99,7 @@
       </table>
     </div>
     <br><br><br><br><br><br><br><br><br>
-
+</div>
     <!-- Leaflet JS-->
     <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"
     integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
