@@ -213,6 +213,12 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 L.geoJson(statesData, {style: style}).addTo(map);
 
 
+// add scrolling feature
+map.scrollWheelZoom.disable();
+this.map.on('click', () => { this.map.scrollWheelZoom.enable();});
+this.map.on('mouseout', () => { this.map.scrollWheelZoom.disable();});
+
+
 //Run inital scripts to generate data
 initalizeChoices()
 initializeStates()
