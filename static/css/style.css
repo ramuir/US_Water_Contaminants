@@ -17,6 +17,10 @@ html {
   width: 90%;
 }
 
+#invisible_table {
+  display: none;
+}
+
 .leaflet-popup-content {
   text-align: center;
 }
