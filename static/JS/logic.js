@@ -99,7 +99,7 @@ function UpdateData() {
 //Updates the data - Called by Update Data
 function ChangeData(call) {
     d3.json(call, function(contaminants) { 
-        // console.log(contaminants);
+        console.log(contaminants);
 
         var addInfo=contaminants.info[0]
         UpdateAdditional(addInfo)
@@ -134,7 +134,7 @@ function ChangeData(call) {
 
         }
 
-        L.geoJson(new_statesData, {style: style}).addTo(map);
+        L.geoJson(new_statesData, {style: style, onEachFeature:onEachFeature}).addTo(map);
         return new_statesData
     })
 }
@@ -209,6 +209,8 @@ function UpdateInvTable(data) {
     rowheader.append('th').text("Measured_Number").attr('class','table-head')
     rowheader.append('th').text("State").attr('class','table-head')
     rowheader.append('th').text("Total_Number").attr('class','table-head')
+    rowheader.append('th').text("Total_Pop").attr('class','table-head')
+    
 
     var Tdata=d3.select("#table_body_inv")
     Tdata.html("")
@@ -218,12 +220,13 @@ function UpdateInvTable(data) {
         Tdata.append('tr').attr("id", listName)
         var row= d3.select('#'+listName)
 
-        row.append('th').text(data[i]["Caution_Number"])
-        row.append('th').text(data[i]["Danger_Number"])
-        row.append('th').text(data[i]["Extreme_C_Number"])
-        row.append('th').text(data[i]["Measured_Number"])
-        row.append('th').text(data[i]["State"])
-        row.append('th').text(data[i]["Total_Number"])
+        row.append('th').text(data[i]["Caution_Number"]).attr('id', 'c')
+        row.append('th').text(data[i]["Danger_Number"]).attr('id', 'd')
+        row.append('th').text(data[i]["Extreme_C_Number"]).attr('id', 'exc')
+        row.append('th').text(data[i]["Measured_Number"]).attr('id', 'meas')
+        row.append('th').text(data[i]["State"]).attr('id', 'st')
+        row.append('th').text(data[i]["Total_Number"]).attr('id', 'tot')
+        row.append('th').text(data[i]["Total_Pop"]).attr('id', 'pop')
     }
 }
 
@@ -231,6 +234,65 @@ function UpdateInvTable(data) {
 
 
 
+
+
+
+//Functions to display Hover-Data popup
+function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.7
+    });
+
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+    }
+    info.update(layer.feature.properties)
+}
+
+function resetHighlight(e) {
+    geojson.resetStyle(e.target);
+    info.update()
+}
+
+function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+    });
+}
+
+function GetInvData(name) {
+    name=name.replace(' ','_').replace(' ','_')
+    var id = '#' + name + '_counts'
+    var data={}
+    if (d3.select(id).empty() != true) {
+        data={
+            'Total':d3.select(id).select('#tot').text(),
+            'Caution':d3.select(id).select('#c').text(),
+            'ExCaution':d3.select(id).select('#exc').text(),
+            'Danger':d3.select(id).select('#d').text(),
+            'Measured':d3.select(id).select('#meas').text(),
+            'Population':d3.select(id).select('#pop').text(),
+            'Values': 0
+        }
+    } else {
+        data={
+            'Total':0,
+            'Caution':0,
+            'ExCaution':0,
+            'Danger':0,
+            'Measured':0,
+            'Population':0,
+            'Values': 1
+        }
+    }
+    return data
+}
 
 
 
@@ -252,21 +314,52 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     accessToken: mapboxAccessToken
 }).addTo(map);
 
+
+
+//Create pop-out and info functions
+
+var info = L.control()
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info')
+    this.update()
+    return this._div
+}
+
+info.update = function(props) {
+    if (typeof props != "undefined") {
+        data = GetInvData(props.name)
+        // console.log(data)
+        if (data.Values==0) {
+            this._div.innerHTML = '<h4>Station Measurement Information</h4>' + (props ?
+                '<b>' + props.name + 
+                '</b><br><br>Total Stations Measured:   <b>' + data.Total +
+                '</b><br>Total Population Served in State:   <b>' + data.Population + 
+                '</b><br>Stations with Detected Measure:   <b>' + data.Measured +
+                '</b><br>Stations with Caution Measure:   <b>' + data.Caution +
+                '</b><br>Stations with Extreme Caution Measure:   <b>' + data.ExCaution +
+                '</b><br>Stations with Danger Measure:   <b>' + data.Danger : 'Hover over a state')
+        } else {
+            this._div.innerHTML = '<h4>Station Measurement Information</h4>' + (props ?
+                '<b>' + props.name + '</b><br><br>No Measurements Conducted in this State': 'Hover over a state')
+        }
+    } else {
+        this._div.innerHTML = '<h4>Station Measurement Information</h4>' + (props ?
+            '<b>' + props.name + '<br>': 'Hover over a state')
+    }
+
+    
+
+}
+
+info.addTo(map)
+
+
+
+
 //Add choropleth to the map
-L.geoJson(statesData, {style: style}).addTo(map);
+var geojson = L.geoJson(statesData, {style: style, onEachFeature: onEachFeature}).addTo(map);
 
-
-// add scrolling feature
-map.scrollWheelZoom.disable();
-this.map.on('click', () => { this.map.scrollWheelZoom.enable();});
-this.map.on('mouseout', () => { this.map.scrollWheelZoom.disable();});
-
-
-//Run inital scripts to generate data
-initalizeChoices()
-initializeStates()
-call_init="/api/ARSENIC/Alabama"
-ChangeData(call_init)
 
 
 //Add Legend to the map
@@ -291,12 +384,25 @@ legend.onAdd = function(map) {
             '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
             grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + ' Above Threshold <br>': '+ Above Threshold') 
         }
-        console.log(getColor(grades[i] + 1))
+        // console.log(getColor(grades[i] + 1))
     }
     return div
 }
-
 legend.addTo(map);
+
+
+
+// add scrolling feature
+map.scrollWheelZoom.disable();
+this.map.on('click', () => { this.map.scrollWheelZoom.enable();});
+this.map.on('mouseout', () => { this.map.scrollWheelZoom.disable();});
+
+
+//Run inital scripts to generate data
+initalizeChoices()
+initializeStates()
+call_init="/api/ARSENIC/Alabama"
+ChangeData(call_init)
 
 // Update data based on User dropdown select
 d3.selectAll('#selDataset').on("change",UpdateData)

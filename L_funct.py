@@ -31,7 +31,8 @@ def find_analyte(analyte, state):
                 "Extreme_C_Number": [],
                 "Danger_Number": [],
                 "Measured_Number": [],
-                "Total_Number": []})
+                "Total_Number": [],
+                "Total_Pop":[]})
 
     for s in data['State'].unique():
         d = data.loc[data['State']==s]
@@ -46,7 +47,8 @@ def find_analyte(analyte, state):
                 "Extreme_C_Number": [num_exc],
                 "Danger_Number": [num_d],
                 "Measured_Number": [num_val],
-                "Total_Number": [num_tot]})
+                "Total_Number": [num_tot],
+                "Total_Pop":[int(d['Retail Population Served'].sum())]})
         num_df=num_df.append(num_dict)
 
     return num_df, data_s
